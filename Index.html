@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be_Creatives Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #d4af37, #ffcc00);
+    text-align: center;
+  }
+  header {
+    padding: 40px 20px;
+  }
+  header h1 {
+    font-size: 42px;
+    font-weight: 900;
+    color: #000;
+  }
+  header p {
+    font-size: 18px;
+    color: #222;
+  }
+  .dashboard-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+  }
+  .dashboard-buttons button {
+    background: #ffcc00;
+    color: #000;
+    border: none;
+    padding: 15px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .section {
+    display: none;
+    background: rgba(255,255,255,0.15);
+    margin: 20px auto;
+    padding: 20px;
+    width: 90%;
+    border-radius: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    color: #000;
+  }
+  table th, table td {
+    padding: 12px;
+    border-bottom: 1px solid #ccc;
+    text-align: center;
+  }
+  table th {
+    background: #f7e99c;
+  }
+  .grand-total-row {
+    background: #fff8d1;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .bill-actions {
+    margin-top: 15px;
+  }
+  .bill-actions button {
+    margin: 5px;
+    padding: 8px 15px;
+    border: none;
+    background: #ffcc00;
+    color: #000;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .pdf-container {
+    background: #fff;
+    color: #000;
+    padding: 20px;
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+  }
+  .pdf-header {
+    text-align: center;
+    background: #fff;
+    color: #000;
+    padding: 15px;
+    font-weight: bold;
+  }
+  .pdf-header h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 900;
+  }
+  .pdf-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background: #fff8d1;
+    color: #000;
+    font-weight: 500;
+  }
+  @media print {
+    .bill-actions { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Be_Creatives</h1>
+  <p>Your Creative Partner in Smart Invoicing</p>
+</header>
+
+<div class="dashboard-buttons">
+  <button onclick="showSection('clients')">Client Details</button>
+  <button onclick="showSection('paid')">Paid Clients</button>
+  <button onclick="showSection('unpaid')">Unpaid Clients</button>
+  <button onclick="showSection('history')">History</button>
+  <button onclick="showSection('billbook')">Bill Book</button>
+</div>
+
+<!-- CLIENTS -->
+<div id="clients" class="section">
+  <h2>Client Details</h2>
+  <button onclick="addClient()">➕ Add New Client</button>
+  <table id="clientTable">
+    <thead><tr><th>Name</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- PAID -->
+<div id="paid" class="section">
+  <h2>Paid Clients</h2>
+  <table id="paidTable"><thead><tr><th>Name</th><th>Amount</th><th>Date</th></tr></thead><tbody></tbody></table>
+</div>
+
+<!-- UNPAID -->
+<div id="unpaid" class="section">
+  <h2>Unpaid Clients</h2>
+  <table id="unpaidTable"><thead><tr><th>Name</th><th>Amount</th><th>Due</th></tr></thead><tbody></tbody></table>
+</div>
+
+<!-- HISTORY -->
+<div id="history" class="section">
+  <h2>Payment History</h2>
+  <table id="historyTable"><thead><tr><th>Name</th><th>Status</th><th>Amount</th><th>Date</th></tr></thead><tbody></tbody></table>
+</div>
+
+<!-- BILL BOOK -->
+<div id="billbook" class="section">
+  <h2>Bill Book</h2>
+  <div id="billArea" class="pdf-container">
+    <div class="pdf-header">
+      <h2>Be_Creatives Invoice</h2>
+      <p>Email: basimaslam419@gmail.com | Phone: +91 62829 25271</p>
+    </div>
+    <table id="billTable">
+      <thead><tr><th>#</th><th>Item</th><th>Price (₹)</th><th>Qty</th><th>Total</th><th>Delete</th></tr></thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr class="grand-total-row">
+          <td colspan="4">Grand Total</td>
+          <td colspan="2" id="grandTotalCell">₹0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="pdf-footer">✨ Thank you for your business with Be_Creatives ✨</div>
+    <div class="bill-actions">
+      <button onclick="addBillItem()">Add Item</button>
+      <button onclick="generatePDF()">Download PDF</button>
+      <button onclick="shareWhatsApp()">Share WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<footer>© 2025 Be_Creatives | Designed for Smart Invoicing</footer>
+
+<script>
+let clients = [];
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+function addClient(){
+  let name=prompt('Enter Client Name');
+  if(name){
+    let status=prompt('Enter Status (Paid/Unpaid)','Unpaid');
+    clients.push({name,status});
+    renderClients();
+  }
+}
+function renderClients(){
+  let tb=document.querySelector('#clientTable tbody');
+  tb.innerHTML='';
+  clients.forEach((c,i)=>{
+    tb.innerHTML+=`<tr><td>${c.name}</td><td>${c.status}</td>
+      <td>
+        <button onclick="editClient(${i})">Edit</button>
+        <button onclick="deleteClient(${i})">Delete</button>
+      </td></tr>`;
+  });
+}
+function editClient(i){
+  let n=prompt('Edit Client Name',clients[i].name);
+  let s=prompt('Update Status (Paid/Unpaid)',clients[i].status);
+  if(n){
+    clients[i].name=n;
+    clients[i].status=s;
+    renderClients();
+  }
+}
+function deleteClient(i){
+  if(confirm('Delete this client?')){
+    clients.splice(i,1);
+    renderClients();
+  }
+}
+function addBillItem(){
+  let tb=document.querySelector('#billTable tbody');
+  let count=tb.rows.length+1;
+  let row=`<tr>
+    <td>${count}</td>
+    <td contenteditable="true">Item</td>
+    <td contenteditable="true">0</td>
+    <td contenteditable="true">1</td>
+    <td>0.00</td>
+    <td><button onclick="this.closest('tr').remove();updateTotal();">❌</button></td>
+  </tr>`;
+  tb.insertAdjacentHTML('beforeend',row);
+  updateTotal();
+}
+function updateTotal(){
+  let total=0;
+  document.querySelectorAll('#billTable tbody tr').forEach(row=>{
+    let price=parseFloat(row.cells[2].innerText)||0;
+    let qty=parseInt(row.cells[3].innerText)||1;
+    let sum=price*qty;
+    row.cells[4].innerText=sum.toFixed(2);
+    total+=sum;
+  });
+  document.getElementById('grandTotalCell').innerText='₹'+total.toFixed(2);
+}
+function generatePDF(){
+  document.querySelector('.bill-actions').style.display='none';
+  const element=document.getElementById('billArea');
+  const opt={
+    margin:0.2,
+    filename:'invoice.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2},
+    jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
+  };
+  html2pdf().from(element).set(opt).save().then(()=>{
+    document.querySelector('.bill-actions').style.display='block';
+  });
+}
+function shareWhatsApp(){
+  let msg=`Thank you for your payment!\nBe_Creatives - Smart Invoicing`;
+  let url="https://wa.me/?text="+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+</script>
+</body>
+</html>
