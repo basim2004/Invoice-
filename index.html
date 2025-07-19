@@ -6,112 +6,25 @@
 <title>Be_Creatives Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-  body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #d4af37, #ffcc00);
-    text-align: center;
-  }
-  header {
-    padding: 40px 20px;
-  }
-  header h1 {
-    font-size: 42px;
-    font-weight: 900;
-    color: #000;
-  }
-  header p {
-    font-size: 18px;
-    color: #222;
-  }
-  .dashboard-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    margin: 30px 0;
-  }
-  .dashboard-buttons button {
-    background: #ffcc00;
-    color: #000;
-    border: none;
-    padding: 15px 25px;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .section {
-    display: none;
-    background: rgba(255,255,255,0.15);
-    margin: 20px auto;
-    padding: 20px;
-    width: 90%;
-    border-radius: 12px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    background: #fff;
-    color: #000;
-  }
-  table th, table td {
-    padding: 12px;
-    border-bottom: 1px solid #ccc;
-    text-align: center;
-  }
-  table th {
-    background: #f7e99c;
-  }
-  .grand-total-row {
-    background: #fff8d1;
-    font-weight: bold;
-    font-size: 18px;
-  }
-  .bill-actions {
-    margin-top: 15px;
-  }
-  .bill-actions button {
-    margin: 5px;
-    padding: 8px 15px;
-    border: none;
-    background: #ffcc00;
-    color: #000;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .pdf-container {
-    background: #fff;
-    color: #000;
-    padding: 20px;
-    border: 2px solid #ffd700;
-    border-radius: 8px;
-  }
-  .pdf-header {
-    text-align: center;
-    background: #fff;
-    color: #000;
-    padding: 15px;
-    font-weight: bold;
-  }
-  .pdf-header h2 {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 900;
-  }
-  .pdf-footer {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    background: #fff8d1;
-    color: #000;
-    font-weight: 500;
-  }
-  @media print {
-    .bill-actions { display: none !important; }
-  }
+  body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#d4af37,#fff8e1);text-align:center;}
+  header{padding:30px;}
+  header h1{font-size:40px;font-weight:900;color:#000;}
+  header p{font-size:16px;color:#333;}
+  .dashboard-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin:20px;}
+  .dashboard-buttons button{background:#f7d774;color:#000;border:none;padding:12px 20px;font-size:15px;border-radius:8px;cursor:pointer;font-weight:600;}
+  .section{display:none;background:rgba(255,255,255,0.2);margin:20px auto;padding:20px;width:90%;border-radius:12px;}
+  table{width:100%;border-collapse:collapse;margin-top:20px;background:#fff;color:#000;}
+  table th,table td{padding:10px;border-bottom:1px solid #ccc;text-align:center;}
+  table th{background:#fff6d5;}
+  .grand-total-row{background:#fff3c4;font-weight:bold;font-size:18px;}
+  .bill-actions{margin-top:15px;}
+  .bill-actions button{margin:5px;padding:8px 15px;border:none;background:#f7d774;color:#000;border-radius:6px;cursor:pointer;font-weight:bold;}
+  .pdf-container{background:#fff;color:#000;padding:20px;border:2px solid #d4af37;border-radius:8px;}
+  .pdf-header{text-align:center;background:#fff;color:#000;padding:10px;font-weight:bold;}
+  .pdf-header h2{margin:0;font-size:26px;font-weight:900;}
+  .client-info{text-align:left;margin:10px 0;padding:8px;background:#fffbea;border-radius:8px;}
+  .pdf-footer{text-align:center;margin-top:15px;padding:8px;background:#fffbea;color:#000;font-weight:500;}
+  @media print{.bill-actions{display:none!important;}}
 </style>
 </head>
 <body>
@@ -129,7 +42,7 @@
   <button onclick="showSection('billbook')">Bill Book</button>
 </div>
 
-<!-- CLIENTS -->
+<!-- CLIENT DETAILS -->
 <div id="clients" class="section">
   <h2>Client Details</h2>
   <button onclick="addClient()">➕ Add New Client</button>
@@ -148,7 +61,7 @@
 <!-- UNPAID -->
 <div id="unpaid" class="section">
   <h2>Unpaid Clients</h2>
-  <table id="unpaidTable"><thead><tr><th>Name</th><th>Amount</th><th>Due</th></tr></thead><tbody></tbody></table>
+  <table id="unpaidTable"><thead><tr><th>Name</th><th>Amount</th><th>Date</th></tr></thead><tbody></tbody></table>
 </div>
 
 <!-- HISTORY -->
@@ -160,11 +73,39 @@
 <!-- BILL BOOK -->
 <div id="billbook" class="section">
   <h2>Bill Book</h2>
+
+  <!-- Client Info -->
+  <div>
+    <h3>Client Info</h3>
+    <input type="text" id="clientName" placeholder="Client Name">
+    <input type="text" id="clientAddress" placeholder="Client Address">
+    <input type="text" id="clientPhone" placeholder="Client Phone">
+    <button onclick="saveClientInfo()">Save Client Info</button>
+  </div>
+
+  <!-- Payment Status Dropdown -->
+  <div style="margin-top:10px;">
+    <label><strong>Payment Status:</strong></label>
+    <select id="paymentStatus">
+      <option value="Paid">Paid</option>
+      <option value="Unpaid">Unpaid</option>
+    </select>
+  </div>
+
   <div id="billArea" class="pdf-container">
     <div class="pdf-header">
       <h2>Be_Creatives Invoice</h2>
       <p>Email: basimaslam419@gmail.com | Phone: +91 62829 25271</p>
     </div>
+
+    <!-- Saved Client Info -->
+    <div class="client-info" id="savedClientInfo">
+      <strong>Client Name:</strong> <span id="cName">N/A</span><br>
+      <strong>Address:</strong> <span id="cAddress">N/A</span><br>
+      <strong>Phone:</strong> <span id="cPhone">N/A</span><br>
+      <strong>Payment Status:</strong> <span id="cStatus">Paid</span>
+    </div>
+
     <table id="billTable">
       <thead><tr><th>#</th><th>Item</th><th>Price (₹)</th><th>Qty</th><th>Total</th><th>Delete</th></tr></thead>
       <tbody></tbody>
@@ -175,9 +116,11 @@
         </tr>
       </tfoot>
     </table>
+
     <div class="pdf-footer">✨ Thank you for your business with Be_Creatives ✨</div>
     <div class="bill-actions">
       <button onclick="addBillItem()">Add Item</button>
+      <button onclick="saveBill()">Save Bill</button>
       <button onclick="generatePDF()">Download PDF</button>
       <button onclick="shareWhatsApp()">Share WhatsApp</button>
     </div>
@@ -187,11 +130,16 @@
 <footer>© 2025 Be_Creatives | Designed for Smart Invoicing</footer>
 
 <script>
-let clients = [];
+let clients=[],paidList=[],unpaidList=[],historyList=[];
+
 function showSection(id){
   document.querySelectorAll('.section').forEach(s=>s.style.display='none');
   document.getElementById(id).style.display='block';
+  if(id==="paid") renderPaid();
+  if(id==="unpaid") renderUnpaid();
+  if(id==="history") renderHistory();
 }
+
 function addClient(){
   let name=prompt('Enter Client Name');
   if(name){
@@ -200,6 +148,7 @@ function addClient(){
     renderClients();
   }
 }
+
 function renderClients(){
   let tb=document.querySelector('#clientTable tbody');
   tb.innerHTML='';
@@ -211,6 +160,7 @@ function renderClients(){
       </td></tr>`;
   });
 }
+
 function editClient(i){
   let n=prompt('Edit Client Name',clients[i].name);
   let s=prompt('Update Status (Paid/Unpaid)',clients[i].status);
@@ -226,6 +176,15 @@ function deleteClient(i){
     renderClients();
   }
 }
+
+function saveClientInfo(){
+  document.getElementById("cName").innerText=document.getElementById("clientName").value||"N/A";
+  document.getElementById("cAddress").innerText=document.getElementById("clientAddress").value||"N/A";
+  document.getElementById("cPhone").innerText=document.getElementById("clientPhone").value||"N/A";
+  document.getElementById("cStatus").innerText=document.getElementById("paymentStatus").value;
+  alert("Client Info & Status Saved!");
+}
+
 function addBillItem(){
   let tb=document.querySelector('#billTable tbody');
   let count=tb.rows.length+1;
@@ -251,25 +210,59 @@ function updateTotal(){
   });
   document.getElementById('grandTotalCell').innerText='₹'+total.toFixed(2);
 }
+
+function saveBill(){
+  let client=document.getElementById("cName").innerText;
+  let total=document.getElementById("grandTotalCell").innerText.replace('₹','')||"0";
+  let status=document.getElementById("paymentStatus").value;
+  document.getElementById("cStatus").innerText=status;
+  if(client==="N/A"){alert("Save Client Info First!");return;}
+  let date=new Date().toLocaleDateString();
+  let entry={name:client,amount:total,status:status,date:date};
+
+  historyList.push(entry);
+  if(status==="Paid"){paidList.push(entry);}
+  else{unpaidList.push(entry);}
+  alert("Bill Saved! Status: "+status);
+}
+
+function renderPaid(){
+  let tb=document.querySelector('#paidTable tbody');
+  tb.innerHTML='';
+  paidList.forEach(p=>{
+    tb.innerHTML+=`<tr><td>${p.name}</td><td>₹${p.amount}</td><td>${p.date}</td></tr>`;
+  });
+}
+function renderUnpaid(){
+  let tb=document.querySelector('#unpaidTable tbody');
+  tb.innerHTML='';
+  unpaidList.forEach(p=>{
+    tb.innerHTML+=`<tr><td>${p.name}</td><td>₹${p.amount}</td><td>${p.date}</td></tr>`;
+  });
+}
+function renderHistory(){
+  let tb=document.querySelector('#historyTable tbody');
+  tb.innerHTML='';
+  historyList.forEach(h=>{
+    tb.innerHTML+=`<tr><td>${h.name}</td><td>${h.status}</td><td>₹${h.amount}</td><td>${h.date}</td></tr>`;
+  });
+}
+
 function generatePDF(){
   document.querySelector('.bill-actions').style.display='none';
   const element=document.getElementById('billArea');
-  const opt={
-    margin:0.2,
-    filename:'invoice.pdf',
-    image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2},
-    jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
-  };
+  const opt={margin:0.2,filename:'invoice.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2},jsPDF:{unit:'in',format:'a4',orientation:'portrait'}};
   html2pdf().from(element).set(opt).save().then(()=>{
     document.querySelector('.bill-actions').style.display='block';
   });
 }
+
 function shareWhatsApp(){
-  let msg=`Thank you for your payment!\nBe_Creatives - Smart Invoicing`;
+  let client=document.getElementById("cName").innerText;
+  let msg=`Thank you ${client} for your payment!\nBe_Creatives - Smart Invoicing`;
   let url="https://wa.me/?text="+encodeURIComponent(msg);
   window.open(url,'_blank');
 }
 </script>
 </body>
-</html>
+        </html>
